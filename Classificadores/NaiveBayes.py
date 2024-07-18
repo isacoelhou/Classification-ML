@@ -41,7 +41,9 @@ print("\nMelhor configuração para o NB")
 print("Acurácia sobre a validação: ", Acc)
 
 print("\n\nDesempenho sobre o conjunto de teste")
+
 NB = GaussianNB()
 NB.fit(x_treino,y_treino)
 opiniao = NB.predict(x_teste)
+
 print("\n\nAcurácia sobre o teste: ",accuracy_score(y_teste, opiniao))
