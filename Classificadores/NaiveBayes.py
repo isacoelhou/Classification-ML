@@ -8,7 +8,7 @@ media = 0
 
 for _ in range(20):
 
-    dados = pd.read_csv("../Dataset/battle.csv")
+    dados = pd.read_csv("../Dataset/studentp.csv")
     print(dados.head())
     print("\n\n\n")
     print(dados.info())
