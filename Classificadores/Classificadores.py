@@ -42,7 +42,7 @@ for _ in range(2):
     Acc_knn = []
 
     for j in ("distance","uniform"):
-        for i in range (1,20):
+        for i in range (1,50):
 
             KNN = KNeighborsClassifier(n_neighbors=i,weights=j)
             KNN.fit(x_treino,y_treino)
@@ -72,9 +72,9 @@ for _ in range(2):
     Acc_DT = []
     
     for j in ("entropy","gini"):  #criterion
-        for i in range (1,20):      #max_depth
-            for k in range (1,20):    #min_samples_leaf
-                for l in range (2,20):  #min_samples_split
+       for i in (3,4,5,6,7):      #max_depth
+            for k in (3,4,5,6):    #min_samples_leaf
+                for l in (5,6,8,10):  #min_samples_split
                     for m in ('best','random'): #splitter
                         
                         AD = DecisionTreeClassifier(criterion=j,max_depth=i,min_samples_leaf=k,min_samples_split=l,splitter=m)
@@ -113,11 +113,11 @@ for _ in range(2):
     maior = -1
     Acc_SVM = []
     for k in ("linear", "poly", "rbf", "sigmoid"):  #kernel
-        for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0):  #custo
+        for i in (0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1):  #custo
 
             SVM = SVC(kernel=k,C=i)
             SVM.fit(x_treino,y_treino)
-            
+
             opiniao = SVM.predict(x_validacao)
             Acc = accuracy_score(y_validacao, opiniao)
             #print("Kernel: ",k," C: ",i," Acc: ",Acc)
