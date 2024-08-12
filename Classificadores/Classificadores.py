@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 
-for _ in range(20):
+for _ in range(2):
 
     dados = pd.read_csv("../Dataset/studentp.csv")
 
@@ -76,11 +76,14 @@ for _ in range(20):
             for k in range (1,20):    #min_samples_leaf
                 for l in range (2,20):  #min_samples_split
                     for m in ('best','random'): #splitter
+                        
                         AD = DecisionTreeClassifier(criterion=j,max_depth=i,min_samples_leaf=k,min_samples_split=l,splitter=m)
                         AD.fit(x_treino,y_treino)
+                        
                         opiniao = AD.predict(x_validacao)
                         Acc = accuracy_score(y_validacao, opiniao)
-                        print("Criterion: ",j," max_depth: ",i," min_samples_leaf: ",k," min_samples_split: ",l," splitter: ",m," Acc: ",Acc)
+                        
+                        #print("Criterion: ",j," max_depth: ",i," min_samples_leaf: ",k," min_samples_split: ",l," splitter: ",m," Acc: ",Acc)
                         if (Acc > maior):
                             maior = Acc
                             crit = j
@@ -111,11 +114,13 @@ for _ in range(20):
     Acc_SVM = []
     for k in ("linear", "poly", "rbf", "sigmoid"):  #kernel
         for i in (0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0):  #custo
+
             SVM = SVC(kernel=k,C=i)
             SVM.fit(x_treino,y_treino)
+            
             opiniao = SVM.predict(x_validacao)
             Acc = accuracy_score(y_validacao, opiniao)
-            print("Kernel: ",k," C: ",i," Acc: ",Acc)
+            #print("Kernel: ",k," C: ",i," Acc: ",Acc)
             if (Acc > maior):
                 maior = Acc
                 ker = k
@@ -192,4 +197,16 @@ for _ in range(20):
     # print("\n\nAcurácia sobre o teste: ", Acc)
     Acc_NB.append(Acc)
 
-print("\n\nMedia de acurácia do Naive Bayes:", media/20)
+import pandas as pd
+
+estrategias = ["KNN", "DT", "MLP", "SVM", "NB"]
+acuracias = [Acc_knn/2, Acc_DT/2, Acc_MLP/2, Acc_SVM/2, Acc_NB/2]
+
+df = pd.DataFrame({
+    'Estrategia': estrategias,
+    'Acc': acuracias
+})
+
+df.set_index('Estrategia', inplace=True)
+
+df.to_csv('./stats.csv')
