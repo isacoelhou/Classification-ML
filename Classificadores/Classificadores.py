@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 
-for _ in range(2):
+for _ in range(20):
 
     dados = pd.read_csv("../Dataset/studentp.csv")
 
@@ -200,7 +200,7 @@ for _ in range(2):
 import pandas as pd
 
 estrategias = ["KNN", "DT", "MLP", "SVM", "NB"]
-acuracias = [Acc_knn/2, Acc_DT/2, Acc_MLP/2, Acc_SVM/2, Acc_NB/2]
+acuracias = [Acc_knn/20, Acc_DT/20, Acc_MLP/20, Acc_SVM/20, Acc_NB/20]
 
 df = pd.DataFrame({
     'Estrategia': estrategias,
