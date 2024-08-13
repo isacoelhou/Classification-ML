@@ -199,14 +199,14 @@ for _ in range(20):
 
 import pandas as pd
 
-estrategias = ["KNN", "DT", "MLP", "SVM", "NB"]
-acuracias = [Acc_knn/20, Acc_DT/20, Acc_MLP/20, Acc_SVM/20, Acc_NB/20]
+# estrategias = ["KNN", "DT", "MLP", "SVM", "NB"]
+# acuracias = [Acc_knn/20, Acc_DT/20, Acc_MLP/20, Acc_SVM/20, Acc_NB/20]
 
-df = pd.DataFrame({
-    'Estrategia': estrategias,
-    'Acc': acuracias
-})
+# df = pd.DataFrame({
+#     'Estrategia': estrategias,
+#     'Acc': acuracias
+# })
 
-df.set_index('Estrategia', inplace=True)
+# df.set_index('Estrategia', inplace=True)
 
-df.to_csv('./stats.csv')
+# df.to_csv('./stats.csv')
