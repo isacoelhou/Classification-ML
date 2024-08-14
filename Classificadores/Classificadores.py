@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 
-for _ in range(20):
+for _ in range(1):
 
     dados = pd.read_csv("../Dataset/studentp.csv")
 
@@ -56,17 +56,19 @@ for _ in range(20):
                 Melhor_k = i
                 Melhor_metrica = j
 
-            KNN = KNeighborsClassifier(n_neighbors=Melhor_k,weights=Melhor_metrica)
-            KNN.fit(x_treino,y_treino)
+        KNN = KNeighborsClassifier(n_neighbors=Melhor_k,weights=Melhor_metrica)
+        KNN.fit(x_treino,y_treino)
 
-            opiniao = KNN.predict(x_teste)
+        probabilidades_knn = KNN.predict_proba(x_teste)
 
-            Acc = accuracy_score(y_teste, opiniao)
-            Acc_knn.append(Acc)
+        opiniao = KNN.predict(x_teste)
+        Acc = accuracy_score(y_teste, opiniao)
+        Acc_knn.append(Acc)
 
-        ###############################################KNN##########################################################
 
-        ###############################################DT###########################################################
+#         ###############################################KNN##########################################################
+
+#         ###############################################DT###########################################################
 
     maior = -1
     Acc_DT = []
@@ -101,14 +103,16 @@ for _ in range(20):
     AD.fit(x_treino,y_treino)
 
     opiniao = AD.predict(x_teste)
+    probabilidades_dt = AD.predict(x_teste)
+
     Acc = accuracy_score(y_teste, opiniao)
     Acc_DT.append(Acc)
 
     #print("Acurácia sobre o teste: ",accuracy_score(y_teste, opiniao))
 
-    ###############################################DT###########################################################
+#     ###############################################DT###########################################################
 
-    ###############################################SVM##########################################################
+#     ###############################################SVM##########################################################
 
     maior = -1
     Acc_SVM = []
@@ -135,6 +139,8 @@ for _ in range(20):
     SVM.fit(x_treino,y_treino)
 
     opiniao = SVM.predict(x_teste)
+    probabilidades_svm = SVM.predict(x_teste)
+
     Acc = accuracy_score(y_teste, opiniao)
 
     Acc_SVM.append(Acc)
@@ -171,14 +177,15 @@ for _ in range(20):
     MLP.fit(x_treino,y_treino)
    
     opiniao = MLP.predict(x_teste)
-   
+    probabilidades_mlp = MLP.predict(x_teste)
+
     Acc = accuracy_score(y_teste, opiniao)
     Acc_MLP.append(Acc)
     
 
-    ###############################################MLP##########################################################
+#     ###############################################MLP##########################################################
 
-    ###############################################NB###########################################################
+#     ###############################################NB###########################################################
 
     Acc_NB = []
 
@@ -191,22 +198,39 @@ for _ in range(20):
     # print("\n\nDesempenho sobre o conjunto de teste")
 
     NB.fit(x_treino,y_treino)
+    
     opiniao = NB.predict(x_teste)
+    probabilidades_nb = NB.predict(x_teste)
+
     Acc = accuracy_score(y_teste, opiniao)
 
     # print("\n\nAcurácia sobre o teste: ", Acc)
     Acc_NB.append(Acc)
 
-import pandas as pd
+    c0 =0
+    c1 = 0
+    c2 = 0
+    c3 = 0
+    c4 = 0
 
-# estrategias = ["KNN", "DT", "MLP", "SVM", "NB"]
-# acuracias = [Acc_knn/20, Acc_DT/20, Acc_MLP/20, Acc_SVM/20, Acc_NB/20]
+    regra_da_soma = []
 
-# df = pd.DataFrame({
-#     'Estrategia': estrategias,
-#     'Acc': acuracias
-# })
+    for i in range(len(x_teste)):
+        for j in  range(5):
+            if j == 0:
+                c0 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
+            if j == 1:
+                c1 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
+            if j == 2:
+                c2 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
+            if j == 3:
+                c3 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
+            if j == 4:
+                c4 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
+                valores = [c0, c1, c2, c3, c4]
+                maior_valor = max(valores)
+                posicao = valores.index(maior_valor)
+                regra_da_soma.append[posicao]
 
-# df.set_index('Estrategia', inplace=True)
-
-# df.to_csv('./stats.csv')
+    Acc = accuracy_score(y_teste, regra_da_soma)
+    print(Acc)
