@@ -103,7 +103,7 @@ for _ in range(1):
     AD.fit(x_treino,y_treino)
 
     opiniao = AD.predict(x_teste)
-    probabilidades_dt = AD.predict(x_teste)
+    probabilidades_dt = AD.predict_proba(x_teste)
 
     Acc = accuracy_score(y_teste, opiniao)
     Acc_DT.append(Acc)
@@ -116,31 +116,32 @@ for _ in range(1):
 
     maior = -1
     Acc_SVM = []
-    for k in ("linear", "poly", "rbf", "sigmoid"):  #kernel
-        for i in (0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1):  #custo
 
-            SVM = SVC(kernel=k,C=i)
-            SVM.fit(x_treino,y_treino)
+# Ajustar SVM com suporte a probabilidades
+    for k in ("linear", "poly", "rbf", "sigmoid"):  # kernel
+        for i in (0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1):  # custo
+
+            SVM = SVC(kernel=k, C=i, probability=True)  # Adicionar probability=True
+            SVM.fit(x_treino, y_treino)
 
             opiniao = SVM.predict(x_validacao)
             Acc = accuracy_score(y_validacao, opiniao)
-            #print("Kernel: ",k," C: ",i," Acc: ",Acc)
-            if (Acc > maior):
+            
+            # Verificar se a acurácia é maior que a anterior
+            if Acc > maior:
                 maior = Acc
                 ker = k
                 custo = i
 
-    # print("\nMelhor configuração para o SVM")
-    # print("Kernel: ",ker," C: ",custo)
+    # Treinar o modelo SVM com a melhor configuração encontrada
+    SVM = SVC(kernel=ker, C=custo, probability=True)  # Adicionar probability=True
+    SVM.fit(x_treino, y_treino)
 
-    # print("\n\nDesempenho sobre o conjunto de teste")
+    # Obter probabilidades de classificação para o conjunto de teste
+    probabilidades_svm = SVM.predict_proba(x_teste)
 
-    SVM = SVC(kernel=ker,C=custo)
-    SVM.fit(x_treino,y_treino)
-
+    # Avaliar a acurácia no conjunto de teste
     opiniao = SVM.predict(x_teste)
-    probabilidades_svm = SVM.predict(x_teste)
-
     Acc = accuracy_score(y_teste, opiniao)
 
     Acc_SVM.append(Acc)
@@ -177,7 +178,7 @@ for _ in range(1):
     MLP.fit(x_treino,y_treino)
    
     opiniao = MLP.predict(x_teste)
-    probabilidades_mlp = MLP.predict(x_teste)
+    probabilidades_mlp = MLP.predict_proba(x_teste)
 
     Acc = accuracy_score(y_teste, opiniao)
     Acc_MLP.append(Acc)
@@ -200,37 +201,32 @@ for _ in range(1):
     NB.fit(x_treino,y_treino)
     
     opiniao = NB.predict(x_teste)
-    probabilidades_nb = NB.predict(x_teste)
+    probabilidades_nb = NB.predict_proba(x_teste)
 
     Acc = accuracy_score(y_teste, opiniao)
 
     # print("\n\nAcurácia sobre o teste: ", Acc)
     Acc_NB.append(Acc)
-
-    c0 =0
-    c1 = 0
-    c2 = 0
-    c3 = 0
-    c4 = 0
-
     regra_da_soma = []
 
     for i in range(len(x_teste)):
-        for j in  range(5):
-            if j == 0:
-                c0 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
-            if j == 1:
-                c1 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
-            if j == 2:
-                c2 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
-            if j == 3:
-                c3 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
-            if j == 4:
-                c4 += probabilidades_knn[i][j] + probabilidades_dt[i][j] + probabilidades_mlp[i][j] + probabilidades_nb[i][j]
-                valores = [c0, c1, c2, c3, c4]
-                maior_valor = max(valores)
-                posicao = valores.index(maior_valor)
-                regra_da_soma.append[posicao]
+        c0 = 0
+        c1 = 0
+        c2 = 0
+        c3 = 0
+        c4 = 0
+
+        c0 += probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
+        c1 += probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
+        c2 += probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
+        c3 += probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
+        c4 += probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
+
+        valores = [c0, c1, c2, c3, c4]
+        maior_valor = max(valores)
+        posicao = valores.index(maior_valor)
+        regra_da_soma.append(posicao)
+
 
     Acc = accuracy_score(y_teste, regra_da_soma)
     print(Acc)
