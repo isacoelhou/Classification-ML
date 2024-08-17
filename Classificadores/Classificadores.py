@@ -3,6 +3,7 @@ import sklearn as sk
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from statistics import mode
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -61,8 +62,8 @@ for _ in range(1):
 
         probabilidades_knn = KNN.predict_proba(x_teste)
 
-        opiniao = KNN.predict(x_teste)
-        Acc = accuracy_score(y_teste, opiniao)
+        opiniao_knn = KNN.predict(x_teste)
+        Acc = accuracy_score(y_teste, opiniao_knn)
         Acc_knn.append(Acc)
 
 
@@ -102,10 +103,10 @@ for _ in range(1):
     AD = DecisionTreeClassifier(criterion=crit,max_depth=md,min_samples_leaf=msl,min_samples_split=mss,splitter=split)
     AD.fit(x_treino,y_treino)
 
-    opiniao = AD.predict(x_teste)
+    opiniao_dt = AD.predict(x_teste)
     probabilidades_dt = AD.predict_proba(x_teste)
 
-    Acc = accuracy_score(y_teste, opiniao)
+    Acc = accuracy_score(y_teste, opiniao_dt)
     Acc_DT.append(Acc)
 
     #print("Acurácia sobre o teste: ",accuracy_score(y_teste, opiniao))
@@ -141,8 +142,8 @@ for _ in range(1):
     probabilidades_svm = SVM.predict_proba(x_teste)
 
     # Avaliar a acurácia no conjunto de teste
-    opiniao = SVM.predict(x_teste)
-    Acc = accuracy_score(y_teste, opiniao)
+    opiniao_svm = SVM.predict(x_teste)
+    Acc = accuracy_score(y_teste, opiniao_svm)
 
     Acc_SVM.append(Acc)
 
@@ -177,10 +178,10 @@ for _ in range(1):
     MLP = MLPClassifier(hidden_layer_sizes=(Melhor_i,Melhor_i,Melhor_i), learning_rate=Melhor_j, max_iter=Melhor_k, activation=Melhor_l)
     MLP.fit(x_treino,y_treino)
    
-    opiniao = MLP.predict(x_teste)
+    opiniao_mlp = MLP.predict(x_teste)
     probabilidades_mlp = MLP.predict_proba(x_teste)
 
-    Acc = accuracy_score(y_teste, opiniao)
+    Acc = accuracy_score(y_teste, opiniao_mlp)
     Acc_MLP.append(Acc)
     
 
@@ -200,29 +201,48 @@ for _ in range(1):
 
     NB.fit(x_treino,y_treino)
     
-    opiniao = NB.predict(x_teste)
+    opiniao_nb = NB.predict(x_teste)
     probabilidades_nb = NB.predict_proba(x_teste)
 
-    Acc = accuracy_score(y_teste, opiniao)
+    Acc = accuracy_score(y_teste, opiniao_nb)
 
     # print("\n\nAcurácia sobre o teste: ", Acc)
     Acc_NB.append(Acc)
     regra_da_soma = []
+    voto_majoritario = []
 
-    for i in range(len(x_teste)):
-        c0 = 0
-        c1 = 0
-        c2 = 0
-        c3 = 0
-        c4 = 0
+    for i in range(1):
 
-        c0 += probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
-        c1 += probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
-        c2 += probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
-        c3 += probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
-        c4 += probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
+        c0_rs = 0
+        c0_vm = 0
+        c1_rs = 0
+        c1_vm = 0
+        c2_rs = 0
+        c3_rs = 0
+        c4_rs = 0
+        c2_vm = 0
+        c3_vm = 0
+        c4_vm = 0
 
-        valores = [c0, c1, c2, c3, c4]
+        c0_vm  = opiniao_knn[i]
+        c1_vm = opiniao_dt[i]
+        c2_vm = opiniao_mlp[i]
+        c3_vm = opiniao_svm[i]
+        c4_vm = opiniao_nb[i]
+
+        valores = [c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
+        print(valores)
+        print(mode(valores))
+        voto_majoritario.append(mode(valores))
+
+
+        c0_rs += probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
+        c1_rs += probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
+        c2_rs += probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
+        c3_rs += probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
+        c4_rs += probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
+
+        valores = [c0_rs, c1_rs, c2_rs, c3_rs, c4_rs]
         maior_valor = max(valores)
         posicao = valores.index(maior_valor)
         regra_da_soma.append(posicao)
