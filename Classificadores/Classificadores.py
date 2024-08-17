@@ -1,8 +1,4 @@
 import pandas as pd
-import sklearn as sk
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 from statistics import mode
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
@@ -211,18 +207,10 @@ for _ in range(1):
     regra_da_soma = []
     voto_majoritario = []
 
-    for i in range(1):
 
-        c0_rs = 0
-        c0_vm = 0
-        c1_rs = 0
-        c1_vm = 0
-        c2_rs = 0
-        c3_rs = 0
-        c4_rs = 0
-        c2_vm = 0
-        c3_vm = 0
-        c4_vm = 0
+    #SISTEMAS DE MULTIPLOS CLASSIFICADORES 
+    
+    for i in range(len(x_teste)):
 
         c0_vm  = opiniao_knn[i]
         c1_vm = opiniao_dt[i]
@@ -230,18 +218,20 @@ for _ in range(1):
         c3_vm = opiniao_svm[i]
         c4_vm = opiniao_nb[i]
 
-        valores = [c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
-        print(valores)
-        print(mode(valores))
+        #VOTO MAJORITÁRIO
+
+        valores =[c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
         voto_majoritario.append(mode(valores))
 
 
-        c0_rs += probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
-        c1_rs += probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
-        c2_rs += probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
-        c3_rs += probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
-        c4_rs += probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
-
+        c0_rs = probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
+        c1_rs = probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
+        c2_rs = probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
+        c3_rs = probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
+        c4_rs = probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
+        
+        #REGRA DA SOMA
+        
         valores = [c0_rs, c1_rs, c2_rs, c3_rs, c4_rs]
         maior_valor = max(valores)
         posicao = valores.index(maior_valor)
@@ -250,3 +240,7 @@ for _ in range(1):
 
     Acc = accuracy_score(y_teste, regra_da_soma)
     print(Acc)
+
+    Acc = accuracy_score(y_teste, voto_majoritario)
+    print(Acc)
+
