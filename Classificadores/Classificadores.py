@@ -220,7 +220,7 @@ for _ in range(1):
 
         #VOTO MAJORITÁRIO
 
-        valores =[c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
+        valores = [c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
         voto_majoritario.append(mode(valores))
 
 
@@ -243,4 +243,3 @@ for _ in range(1):
 
     Acc = accuracy_score(y_teste, voto_majoritario)
     print(Acc)
-
