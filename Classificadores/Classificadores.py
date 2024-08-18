@@ -9,6 +9,33 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 
+def bordacount(matriz):
+
+    ranqueada = []
+    
+    for linha in matriz:
+
+        indices_ordenados = sorted(range(len(linha)), key=lambda i: linha[i])
+        posicoes = [0] * len(linha)
+        
+        for ranque, indice in enumerate(indices_ordenados):
+            posicoes[indice] = ranque
+        
+        ranqueada.append(posicoes)
+    
+    return ranqueada
+
+Acc_DT = []
+Acc_knn = []
+Acc_SVM = []
+Acc_MLP = []
+Acc_NB = []
+
+#SMC
+Acc_VM = []
+Acc_RS = []
+Acc_BC = []
+
 for _ in range(1):
 
     dados = pd.read_csv("../Dataset/studentp.csv")
@@ -36,7 +63,6 @@ for _ in range(1):
     ###############################################KNN##########################################################
 
     maior = -1 
-    Acc_knn = []
 
     for j in ("distance","uniform"):
         for i in range (1,50):
@@ -53,14 +79,14 @@ for _ in range(1):
                 Melhor_k = i
                 Melhor_metrica = j
 
-        KNN = KNeighborsClassifier(n_neighbors=Melhor_k,weights=Melhor_metrica)
-        KNN.fit(x_treino,y_treino)
+    KNN = KNeighborsClassifier(n_neighbors=Melhor_k,weights=Melhor_metrica)
+    KNN.fit(x_treino,y_treino)
 
-        probabilidades_knn = KNN.predict_proba(x_teste)
+    probabilidades_knn = KNN.predict_proba(x_teste)
 
-        opiniao_knn = KNN.predict(x_teste)
-        Acc = accuracy_score(y_teste, opiniao_knn)
-        Acc_knn.append(Acc)
+    opiniao_knn = KNN.predict(x_teste)
+    Acc = accuracy_score(y_teste, opiniao_knn)
+    Acc_knn.append(Acc)
 
 
 #         ###############################################KNN##########################################################
@@ -68,7 +94,6 @@ for _ in range(1):
 #         ###############################################DT###########################################################
 
     maior = -1
-    Acc_DT = []
     
     for j in ("entropy","gini"):  #criterion
        for i in (3,4,5,6,7):      #max_depth
@@ -112,7 +137,6 @@ for _ in range(1):
 #     ###############################################SVM##########################################################
 
     maior = -1
-    Acc_SVM = []
 
 # Ajustar SVM com suporte a probabilidades
     for k in ("linear", "poly", "rbf", "sigmoid"):  # kernel
@@ -149,7 +173,6 @@ for _ in range(1):
     ###############################################MLP##########################################################
 
     maior = -1
-    Acc_MLP = []
 
     for i in (5,6,10,12):
         for j in ('constant','invscaling', 'adaptive'):
@@ -185,8 +208,6 @@ for _ in range(1):
 
 #     ###############################################NB###########################################################
 
-    Acc_NB = []
-
     NB = GaussianNB()
     NB.fit(x_treino,y_treino)
     opiniao = NB.predict(x_validacao)
@@ -206,11 +227,32 @@ for _ in range(1):
     Acc_NB.append(Acc)
     regra_da_soma = []
     voto_majoritario = []
-
+    borda_acount = []
 
     #SISTEMAS DE MULTIPLOS CLASSIFICADORES 
-    
+
+    ranqueada_knn = bordacount(probabilidades_knn)
+    ranqueada_dt = bordacount(probabilidades_dt)
+    ranqueada_mlp = bordacount(probabilidades_mlp)
+    ranqueada_nb = bordacount(probabilidades_nb)
+    ranqueada_svm = bordacount(probabilidades_svm)
+
     for i in range(len(x_teste)):
+
+        #BORDACCOUNT
+
+        c0_ba = ranqueada_knn[i][0] + ranqueada_dt[i][0] + ranqueada_mlp[i][0] + ranqueada_nb[i][0] + ranqueada_svm[i][0]
+        c1_ba = ranqueada_knn[i][1] + ranqueada_dt[i][1] + ranqueada_mlp[i][1] + ranqueada_nb[i][1] + ranqueada_svm[i][1]
+        c2_ba = ranqueada_knn[i][2] + ranqueada_dt[i][2] + ranqueada_mlp[i][2] + ranqueada_nb[i][2] + ranqueada_svm[i][2]
+        c3_ba = ranqueada_knn[i][3] + ranqueada_dt[i][3] + ranqueada_mlp[i][3] + ranqueada_nb[i][3] + ranqueada_svm[i][3]
+        c4_ba = ranqueada_knn[i][4] + ranqueada_dt[i][4] + ranqueada_mlp[i][4] + ranqueada_nb[i][4] + ranqueada_svm[i][4]
+        
+        valores = [c0_ba, c1_ba, c2_ba, c3_ba, c4_ba]
+        maior_valor = max(valores)
+        posicao = valores.index(maior_valor)
+        borda_acount.append(posicao)
+
+        #VOTO MAJORITÁRIO
 
         c0_vm  = opiniao_knn[i]
         c1_vm = opiniao_dt[i]
@@ -218,19 +260,17 @@ for _ in range(1):
         c3_vm = opiniao_svm[i]
         c4_vm = opiniao_nb[i]
 
-        #VOTO MAJORITÁRIO
 
         valores = [c0_vm, c1_vm, c2_vm, c3_vm, c4_vm]
         voto_majoritario.append(mode(valores))
 
+        #REGRA DA SOMA
 
         c0_rs = probabilidades_knn[i][0] + probabilidades_dt[i][0] + probabilidades_mlp[i][0] + probabilidades_nb[i][0] + probabilidades_svm[i][0]
         c1_rs = probabilidades_knn[i][1] + probabilidades_dt[i][1] + probabilidades_mlp[i][1] + probabilidades_nb[i][1] + probabilidades_svm[i][1]
         c2_rs = probabilidades_knn[i][2] + probabilidades_dt[i][2] + probabilidades_mlp[i][2] + probabilidades_nb[i][2] + probabilidades_svm[i][2]
         c3_rs = probabilidades_knn[i][3] + probabilidades_dt[i][3] + probabilidades_mlp[i][3] + probabilidades_nb[i][3] + probabilidades_svm[i][3]
         c4_rs = probabilidades_knn[i][4] + probabilidades_dt[i][4] + probabilidades_mlp[i][4] + probabilidades_nb[i][4] + probabilidades_svm[i][4]
-        
-        #REGRA DA SOMA
         
         valores = [c0_rs, c1_rs, c2_rs, c3_rs, c4_rs]
         maior_valor = max(valores)
@@ -240,6 +280,21 @@ for _ in range(1):
 
     Acc = accuracy_score(y_teste, regra_da_soma)
     print(Acc)
+    Acc_RS.append(Acc)
 
     Acc = accuracy_score(y_teste, voto_majoritario)
     print(Acc)
+    Acc_VM.append(Acc)
+
+    Acc = accuracy_score(y_teste, borda_acount)
+    print(Acc)
+    Acc_BC.append(Acc)
+
+print('KNN:', Acc_knn)
+print('DT:', Acc_DT)
+print('MLP:', Acc_MLP)
+print('SVM:', Acc_SVM)
+print('NB:', Acc_NB)
+print('RS:', Acc_RS)
+print('VM:', Acc_VM)
+print('BC:', Acc_BC)
