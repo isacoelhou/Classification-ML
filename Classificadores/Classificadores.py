@@ -36,7 +36,7 @@ Acc_VM = []
 Acc_RS = []
 Acc_BC = []
 
-for _ in range(1):
+for _ in range(20):
 
     dados = pd.read_csv("../Dataset/studentp.csv")
 
@@ -227,7 +227,7 @@ for _ in range(1):
     Acc_NB.append(Acc)
     regra_da_soma = []
     voto_majoritario = []
-    borda_acount = []
+    borda_count = []
 
     #SISTEMAS DE MULTIPLOS CLASSIFICADORES 
 
@@ -250,7 +250,7 @@ for _ in range(1):
         valores = [c0_ba, c1_ba, c2_ba, c3_ba, c4_ba]
         maior_valor = max(valores)
         posicao = valores.index(maior_valor)
-        borda_acount.append(posicao)
+        borda_count.append(posicao)
 
         #VOTO MAJORITÁRIO
 
@@ -286,7 +286,7 @@ for _ in range(1):
     print(Acc)
     Acc_VM.append(Acc)
 
-    Acc = accuracy_score(y_teste, borda_acount)
+    Acc = accuracy_score(y_teste, borda_count)
     print(Acc)
     Acc_BC.append(Acc)
 
@@ -298,3 +298,17 @@ print('NB:', Acc_NB)
 print('RS:', Acc_RS)
 print('VM:', Acc_VM)
 print('BC:', Acc_BC)
+
+import pandas as pd
+
+estrategias = ["K Nearest Neighbors", "Decision Tree", "Multilayer Perceptron", "Suport Vector Machine", "Naive Bayes", "Regra da soma", "Borda Count", "Voto Majoritario"]
+acuracias = [Acc_knn, Acc_DT, Acc_MLP, Acc_SVM, Acc_NB, Acc_RS, Acc_BC ,Acc_VM]
+
+df = pd.DataFrame({
+    'Estrategia': estrategias,
+    'Acc': acuracias
+})
+
+df.set_index('Estrategia', inplace=True)
+
+df.to_csv('./stats/Acuracias.csv')
